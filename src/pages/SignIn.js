@@ -6,14 +6,16 @@ import {useForm} from 'react-hook-form';
 
 function SignIn() {
     const {login} = useContext(AuthContext);
-    const {handleSubmit, register} = useForm();
+    const {handleSubmit, register, formState: {errors}} = useForm();
 
     async function onSubmit(data) {
-        console.log(data);
 
         try {
-            const result = await axios.post('http://localhost:3000/login', data);
-            console.log(result);
+            const result = await axios.post('http://localhost:3000/login', {
+                email: data.email,
+                password: data.password,
+            });
+            // geef de JWT door aan de context
             login(result.data.accessToken);
         } catch (e) {
             console.error(e);
@@ -32,18 +34,26 @@ function SignIn() {
                     <input
                         type="email"
                         id="email-field"
-                        {...register("email")}
+                        {...register("email", {required: "Emailadres is verplicht"})}
                     />
                 </label>
+                {errors.email && <h4>{errors.email.message}</h4>}
 
                 <label htmlFor="password-field">
                     Wachtwoord:
                     <input
                         type="password"
                         id="password-field"
-                        {...register("password")}
+                        {...register("password", {required: "Wachtwoord is verplicht",
+                            minLength: {
+                                value: 6,
+                                message: "Minimaal 6 tekens gebruiken",
+                            }
+                        })}
                     />
                 </label>
+                {errors.password && <h4>{errors.password.message}</h4>}
+
                 <button
                     type="submit"
                     className="form-button"
