@@ -27,7 +27,7 @@ function AuthContextProvider({children}) {
     }
 
     useEffect(() => {
-        // na refresh is userkey leeg, (initial state) maar we
+        // na refresh is user key leeg, (initial state) maar we
         // checken of we nog een (geldige) token hebben in de local storage
         // zo ja, dan willen we op basis van die gegevens opnieuw gebruikersdata ophalen => status 'done
         const token = localStorage.getItem('token');
@@ -93,6 +93,8 @@ function AuthContextProvider({children}) {
     }
 
     function logout() {
+        // JWT uit de local storage halen
+        localStorage.removeItem('token');
 
         setAuthState({
             ...authState,
