@@ -1,45 +1,34 @@
-import React, {createContext, useState, useEffect} from 'react';
+import React, { createContext, useState, useEffect } from 'react';
 import axios from "axios";
 import jwt_decode from "jwt-decode";
-import {useHistory} from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
+import isTokenValid from "../helpers/isTokenValid";
 
 export const AuthContext = createContext({});
 
 function AuthContextProvider({children}) {
-    const [authState, setAuthState] = useState({
+    const [isAuth, toggleIsAuth] = useState({
         isAuth: false,
         user: null,
         status: 'pending',
     });
-
     const history = useHistory();
 
-    function isTokenValid(jwtToken) {
-        const decodedToken = jwt_decode(jwtToken);
-        const expirationUnix = decodedToken.exp; // let op: dit is een UNIX timestamp
-
-        const now = new Date().getTime(); // dit is een javascript timestamp
-        const currentUnix = Math.round(now / 1000); // nu is het ook een UNIX timestamp
-        // Als er nog seconden over zijn wanneer we "nu" aftrekken van de expiratiedatum is hij nog geldig
-        const isTokenStillValid = expirationUnix - currentUnix > 0;
-
-        return isTokenStillValid;
-    }
-
+    // MOUNTING EFFECT
     useEffect(() => {
         // na refresh is user key leeg, (initial state) maar we
         // checken of we nog een (geldige) token hebben in de local storage
         // zo ja, dan willen we op basis van die gegevens opnieuw gebruikersdata ophalen => status 'done
         const token = localStorage.getItem('token');
 
-        if (!authState.user && token && isTokenValid(token)) {
+        if (token && isTokenValid(token)) {
             const decodedToken = jwt_decode(token);
 
             getUserData(token, decodedToken.sub);
         } else {
             // zo nee, dan gaan we verder met ons leven => status: done,
-            setAuthState({
-                ...authState,
+            toggleIsAuth({
+                isAuth: false,
                 user: null,
                 status: 'done',
             });
@@ -58,10 +47,10 @@ function AuthContextProvider({children}) {
 
         // Op basis van die informatie kunnen we de gebruikersgegevens ophalen via een GET-request
         // met async functie etc............en in de state plaatsen
-        getUserData(JWT, userId, authState);
+        getUserData(JWT, userId, '/profile');
     }
 
-    async function getUserData(token, id, authState) {
+    async function getUserData(token, id, redirectUrl) {
         try {
             const result = await axios.get(`http://localhost:3000/600/users/${id}`, {
                 headers: {
@@ -70,8 +59,9 @@ function AuthContextProvider({children}) {
                 }
             });
 
-            setAuthState({
-                ...authState,
+            // zet de gegevens in de state
+            toggleIsAuth({
+                ...isAuth,
                 isAuth: true,
                 user: {
                     username: result.data.username,
@@ -85,35 +75,46 @@ function AuthContextProvider({children}) {
                 status: 'done',
             });
 
-            history.push('/profile');
+            // als er een redirect URL is meegegeven (bij het mount-effect doen we dit niet) linken we hiernnaartoe door
+            // als we de history.push in de login-functie zouden zetten, linken we al door voor de gebuiker is opgehaald!
+            if (redirectUrl) {
+                history.push(redirectUrl);
+            }
 
         } catch (e) {
             console.error(e);
+            //    ging er iets mis? Plaatsen we geen data in de state
+            toggleIsAuth({
+                isAuth: false,
+                user: null,
+                status: 'done',
+            });
         }
     }
 
     function logout() {
         // JWT uit de local storage halen
-        localStorage.removeItem('token');
+        localStorage.clear();
 
-        setAuthState({
-            ...authState,
+        toggleIsAuth({
             isAuth: false,
             user: null,
             status: 'done',
         });
+
         history.push('/');
     }
 
     const contextData = {
-        ...authState,
+        isAuth: isAuth.isAuth,
+        user: isAuth.user,
         login: login,
         logout: logout,
     };
 
     return (
         <AuthContext.Provider value={contextData}>
-            {authState.status === 'done'
+            {isAuth.status === 'done'
                 ? children
                 : <p>Loading...</p>
             }

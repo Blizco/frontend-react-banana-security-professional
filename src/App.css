@@ -22,14 +22,23 @@ button:hover {
   cursor: pointer;
 }
 
+button:disabled {
+    background-color: #FAD57F;
+}
+
 a,
 a:visited,
 a:active {
-  color: #0d3b66;
+color: orangered;
+    font-weight: bold;
+text-decoration: underline;
+    cursor: pointer;
+  /*color: #0d3b66;*/
 }
 
 a:hover {
-  color: #ea7e1f;
+  color: orangered;
+
 }
 
 /*Algemene formulier-styling*/
@@ -96,10 +105,15 @@ section  {
   margin: 0 0 50px 0;
 }
 
+.error-message {
+    color: orangered;
+}
+
 h4 {
-    color: red;
+    color: orangered;
     font-weight: bold;
 }
+
 /*Zet mij op een element en ik blijf voor altijd draaien!*/
 .loading-icon {
   width: 16px;

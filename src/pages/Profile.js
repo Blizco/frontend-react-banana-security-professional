@@ -10,14 +10,15 @@ function Profile() {
 
     useEffect(() => {
         const token = localStorage.getItem('token');
+        const source = axios.CancelToken.source();
 
         async function getPrivateContent() {
             try {
                 const result = await axios.get('http://localhost:3000/660/private-content', {
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
-                    }
+                        Authorization: `Bearer ${token}`},
+                        cancelToken:source.token,
                 });
 
                 setPrivateContent(result.data);
@@ -27,6 +28,11 @@ function Profile() {
         }
 
         getPrivateContent();
+
+        return function cleanup() {
+            source.cancel();
+
+        }
     }, []);
 
   return (
