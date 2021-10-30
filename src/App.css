@@ -6,8 +6,8 @@ is het voor deze opdracht wel gedaan!*/
 button {
   border-radius: 4px;
   border: none;
-  /*color: white;*/
   padding: 8px 16px;
+    margin-top: 10px;
   background-color: #f5ab00;
   color: white;
   font-weight: bold;
@@ -52,14 +52,14 @@ form {
 }
 
 form label {
-  margin: 4px 0;
+  margin: 4px 4px 4px 0;
   font-weight: bold;
 }
 
 form input {
   width: 100%;
-  padding: 4px 8px;
-  margin: 6px 0;
+  padding: 6px 6px;
+  margin: 0 0 8px 0;
 }
 
 h2 {
@@ -71,14 +71,19 @@ h2 {
 }
 
 .form-button {
-  width: 100%;
+  width: 104%;
+}
+
+.popup-button {
+  margin: 20px 0 20px 0;
+    width: 104%;
 }
 
 nav {
   background-color: #0d3b66;
   color: white;
   display: flex;
-  padding: 0 32px;
+  padding: 4px 32px;
   align-items: center;
   justify-content: space-between;
 }
@@ -107,6 +112,10 @@ section  {
 
 .error-message {
     color: orangered;
+}
+
+.normal-message {
+    color: black;
 }
 
 h4 {

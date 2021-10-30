@@ -1,81 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import axios from "axios";
-import { Link, useHistory } from 'react-router-dom';
+import React, { useContext } from 'react';
+import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
+import { AuthContext } from "../context/AuthContext";
 
 function SignUp() {
     // useForm Hooks ipv controlled components met useState email, username en password
-    const {handleSubmit, register, formState: {errors}} = useForm();
+    const {handleSubmit, register, formState: {errors}} = useForm( {mode: "onBlur"});
 
-    const [loading, toggleLoading] = useState(false);
-    const [registerSuccess, toggleRegisterSuccess] = useState(false);
-    const [error, setError] = useState('');
-
-    const [emailExist, toggleEmailExist] = useState(false);
-
-    // We maken een canceltoken aan voor ons netwerk-request
-    const source = axios.CancelToken.source();
-    const history = useHistory();
-
-    //Unmounting ingeval tijdens ophalen data ge-unmount wordt
-    useEffect(() => {
-        return function cleanup() {
-            source.cancel();
-        }
-    }, []);
-
-    async function onSubmit(data) {
-        // omdat onSubmit meerdere keren kan worden aangeroepen, beginnen we altijd met een "schone" lei (geen errors)
-        setError('');
-        toggleLoading(true);
-
-        if (data.username === 'admin') {
-            data.role = 'admin'
-        } else {
-            data.role = 'user'
-        }
-
-        try {
-            const result = await axios.post('http://localhost:3000/register', {
-                email: data.email,
-                password: data.password,
-                country: 'Nederland',
-                username: data.username,
-                role: data.role,
-            }, {
-                cancelToken: source.token,
-            });
-
-            toggleRegisterSuccess(true);
-            // const registerData = JSON.parse(result.config.data);
-            // console.log(`Email (registerData): ${registerData.email}`);
-
-            // we willen even wachten met doorlinken zodat de gebruiker de tijd heeft om de succesmelding ook daadwerkelijk te zien
-            setTimeout(() => {
-                history.push('/signin');
-            }, 3000);
-        } catch (e) {
-
-            // op het error (e) object zit altijd een message property, maar die kan wat abstract zijn. Daarom extra text:
-            if (e.response.data === "Email already exists") {
-                toggleEmailExist(true);
-                // const registerData = JSON.parse(e.config.data);
-                // console.log(`Email (registerData): ${registerData.email}`);
-
-            } else {
-                setError(`Het registeren is mislukt. Probeer het opnieuw (${e.response.data})`);
-            }
-
-            // TIP: Wanneer er echt iets fout gaat, krijg je een 404 error. Wanneer de gebruikersnaam al bestond,
-            // krijg je waarschijnlijk een 400 error.Zo kun je hier ook nog invloed uitoefenen op welke error message je laat zien op de gebruiker!
-        }
-
-        toggleLoading(true);
-    }
-
-    function loginExistingEmail() {
-        history.push('/signin');
-    }
+    // state voor functionaliteit (useContext)
+    const {loading, registerSuccess, emailExist, onSignUp, loginExistingEmail} = useContext(AuthContext);
 
     return (
         <>
@@ -85,7 +18,7 @@ function SignUp() {
                 harum, numquam, placeat quisquam repellat rerum suscipit ullam vitae. A ab ad assumenda, consequuntur
                 deserunt
                 doloremque ea eveniet facere fuga illum in numquam quia reiciendis rem sequi tenetur veniam?</p>
-            <form onSubmit={handleSubmit(onSubmit)}>
+            <form onSubmit={handleSubmit(onSignUp)}>
                 <label htmlFor="email-field">
                     Email:
                     <input
@@ -117,6 +50,7 @@ function SignUp() {
                         })}
                     />
                 </label>
+
                 {errors.password && <p className="error-message">{errors.password.message}</p>}
                 <button
                     type="submit"
@@ -125,15 +59,37 @@ function SignUp() {
                 >
                     Maak account aan
                 </button>
-                {registerSuccess === true &&
-                <p>Registeren is gelukt! Je wordt nu doorgestuurd naar de inlog pagina!</p>}
+
+                {registerSuccess &&
+                <p className="normal-message">Het registreren is gelukt! Klik button voor inloggen met ingevulde email-adres!
+                    <button
+                        type="button"
+                        className="popup-button"
+                        onClick={loginExistingEmail}
+                        >
+                        Inloggen met ingevulde email-adres
+                    </button>
+                </p>}
 
                 {emailExist &&
-                <p className="error-message">Het registeren is mislukt. Het ingevoerde email bestaat al. Ander <a
-                    onClick={() => {
-                        window.location.href = "/signup"
-                    }}>emailadres </a>gebruiken of <a
-                    onClick={loginExistingEmail}>inloggen</a> met dit emailadres!</p>}
+                <p className="error-message">Het registeren is mislukt. Het ingevulde email-adres bestaat al.
+                    <button
+                        type="button"
+                        className="popup-button"
+                        onClick={() => {
+                            window.location.href = "/signup"
+                        }}
+                    >
+                        Ander email-adres gebruiken
+                    </button>
+                    <button
+                        type="button"
+                        className="popup-button"
+                        onClick={loginExistingEmail}
+                    >
+                        Inloggen met ingevulde email-adres
+                    </button>
+                </p>}
             </form>
             <p>Heb je al een account? Je kunt je <Link to="/signin">hier</Link> inloggen.</p>
         </>
