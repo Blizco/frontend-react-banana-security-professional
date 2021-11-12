@@ -9,7 +9,7 @@ function NavBar() {
 
   return (
     <nav>
-      <Link to="/">
+        <Link to="/">
           <span className="logo-container">
             <img src={logo} alt="logo"/>
             <h3>
@@ -17,7 +17,6 @@ function NavBar() {
             </h3>
           </span>
       </Link>
-
       {isAuth ?
         <button
           type="button"

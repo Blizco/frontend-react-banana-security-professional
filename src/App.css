@@ -6,8 +6,8 @@ is het voor deze opdracht wel gedaan!*/
 button {
   border-radius: 4px;
   border: none;
-  /*color: white;*/
   padding: 8px 16px;
+    margin-top: 10px;
   background-color: #f5ab00;
   color: white;
   font-weight: bold;
@@ -22,14 +22,23 @@ button:hover {
   cursor: pointer;
 }
 
+button:disabled {
+    background-color: #FAD57F;
+}
+
 a,
 a:visited,
 a:active {
-  color: #0d3b66;
+color: orangered;
+    font-weight: bold;
+text-decoration: underline;
+    cursor: pointer;
+  /*color: #0d3b66;*/
 }
 
 a:hover {
-  color: #ea7e1f;
+  color: orangered;
+
 }
 
 /*Algemene formulier-styling*/
@@ -43,14 +52,14 @@ form {
 }
 
 form label {
-  margin: 4px 0;
+  margin: 4px 4px 4px 0;
   font-weight: bold;
 }
 
 form input {
   width: 100%;
-  padding: 4px 8px;
-  margin: 6px 0;
+  padding: 6px 6px;
+  margin: 0 0 8px 0;
 }
 
 h2 {
@@ -62,14 +71,19 @@ h2 {
 }
 
 .form-button {
-  width: 100%;
+  width: 104%;
+}
+
+.popup-button {
+  margin: 20px 0 20px 0;
+    width: 104%;
 }
 
 nav {
   background-color: #0d3b66;
   color: white;
   display: flex;
-  padding: 0 32px;
+  padding: 4px 32px;
   align-items: center;
   justify-content: space-between;
 }
@@ -94,6 +108,19 @@ nav a:active {
 
 section  {
   margin: 0 0 50px 0;
+}
+
+.error-message {
+    color: orangered;
+}
+
+.normal-message {
+    color: black;
+}
+
+h4 {
+    color: orangered;
+    font-weight: bold;
 }
 
 /*Zet mij op een element en ik blijf voor altijd draaien!*/
